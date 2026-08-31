@@ -1,69 +1,165 @@
 import Image from "next/image";
+import Button from "@/components/Button";
+import ServiceCard from "@/components/ServiceCard";
+import ReviewCard from "@/components/ReviewCard";
+import { services, reviews } from "@/lib/data";
 
 export default function Home() {
+  const popular = services.filter((s) => s.popular);
+  const topReviews = reviews.slice(0, 3);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div>
+      {/* Hero */}
+      <section className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 md:grid-cols-2 md:items-center md:px-10 md:py-24">
+        <div>
+          <h1 className="font-semibold text-[2.75rem] leading-[1.08] tracking-tight text-on-background md:text-[3.4rem]">
+            Smooth skin,
+            <br />
+            <span className="text-primary">handled with care.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-6 max-w-[42ch] text-[17px] leading-relaxed text-on-surface-muted">
+            Face, body, and brow waxing from Cerologists trained to make it quick, precise, and
+            far more comfortable than you'd expect. Walk in tense, walk out smooth.
           </p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Button href="/booking">Book an appointment</Button>
+            <Button href="/services" variant="outline">
+              Browse services
+            </Button>
+          </div>
+          <div className="mt-10 flex gap-8 border-t border-outline pt-6 text-sm">
+            <div>
+              <p className="font-semibold text-2xl text-on-background">4.9</p>
+              <p className="mt-1 text-on-surface-muted">Average rating</p>
+            </div>
+            <div>
+              <p className="font-semibold text-2xl text-on-background">12k+</p>
+              <p className="mt-1 text-on-surface-muted">Appointments a year</p>
+            </div>
+            <div>
+              <p className="font-semibold text-2xl text-on-background">2</p>
+              <p className="mt-1 text-on-surface-muted">Studio locations</p>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+
+        <div className="relative">
+          <div className="aspect-[4/5] overflow-hidden rounded-lg bg-surface">
             <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
+              alt="A calm, softly lit waxing studio treatment room"
+              width={900}
+              height={1125}
+              className="h-full w-full object-cover"
+              priority
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
+          <div className="absolute -bottom-8 -left-8 hidden aspect-square w-40 overflow-hidden rounded-lg border-4 border-background shadow-raised md:block">
+            <Image
+              src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80"
+              alt="Skincare products arranged on a studio counter"
+              width={400}
+              height={400}
+              className="h-full w-full object-cover"
+            />
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Popular services */}
+      <section className="mx-auto max-w-[1400px] px-6 py-16 md:px-10">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <div>
+            <h2 className="font-semibold text-3xl text-primary">Most-booked services</h2>
+            <p className="mt-2 max-w-[50ch] text-on-surface-muted">
+              A starting point, not the whole menu — see everything we offer with full prep and
+              aftercare details.
+            </p>
+          </div>
+          <Button href="/services" variant="outline" className="w-fit">
+            View all services
+          </Button>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {popular.map((service) => (
+            <ServiceCard key={service.slug} service={service} />
+          ))}
+        </div>
+      </section>
+
+      {/* Why us */}
+      <section className="bg-surface">
+        <div className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 md:grid-cols-2 md:items-center md:px-10 md:py-24">
+          <div className="order-2 aspect-[4/3] overflow-hidden rounded-lg md:order-1">
+            <Image
+              src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=900&q=80"
+              alt="An esthetician preparing wax during an appointment"
+              width={900}
+              height={675}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div className="order-1 md:order-2">
+            <h2 className="font-semibold text-3xl text-primary md:text-4xl">
+              Trained hands, formulated wax, no guesswork.
+            </h2>
+            <p className="mt-5 max-w-[48ch] leading-relaxed text-on-surface-muted">
+              Every Cerologist completes hands-on training before they see a client, and our wax
+              is formulated to grip hair rather than skin — which is most of why our appointments
+              run comfortably rather than painfully. You'll always know what's happening before
+              it happens.
+            </p>
+            <ul className="mt-6 flex flex-col gap-3 text-sm text-on-surface">
+              <li className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                Single-use application sticks, every time
+              </li>
+              <li className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                Low-temperature wax suited to sensitive skin
+              </li>
+              <li className="flex gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                Private rooms for every body service
+              </li>
+            </ul>
+            <Button href="/about" className="mt-8 w-fit">
+              Get to know us
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews */}
+      <section className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 md:py-24">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+          <h2 className="font-semibold text-3xl text-primary">What clients say</h2>
+          <Button href="/reviews" variant="outline" className="w-fit">
+            Read all reviews
+          </Button>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {topReviews.map((review) => (
+            <ReviewCard key={review.name} review={review} />
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-primary">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-6 px-6 py-16 text-on-primary md:flex-row md:items-center md:justify-between md:px-10 md:py-20">
+          <div>
+            <h2 className="font-semibold text-3xl md:text-4xl">Ready for your next appointment?</h2>
+            <p className="mt-3 max-w-[46ch] text-on-primary/80">
+              Pick a service, choose a time that works, and we'll take care of the rest.
+            </p>
+          </div>
+          <Button href="/booking" className="bg-white text-primary hover:bg-white/90">
+            Book an appointment
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
