@@ -20,7 +20,7 @@ export const services: Service[] = [
     slug: "eyebrow-wax",
     category: "Face",
     name: "Eyebrow Wax",
-    price: "$22",
+    price: "KSh 2,200",
     duration: "15 min",
     short: "Professional eyebrow shaping to create a clean, defined brow shape.",
     description:
@@ -42,7 +42,7 @@ export const services: Service[] = [
     slug: "upper-lip-wax",
     category: "Face",
     name: "Upper Lip Wax",
-    price: "$15",
+    price: "KSh 1,500",
     duration: "10 min",
     short: "Quick and precise removal of unwanted hair from the upper lip area.",
     description:
@@ -60,7 +60,7 @@ export const services: Service[] = [
     slug: "chin-wax",
     category: "Face",
     name: "Chin Wax",
-    price: "$15",
+    price: "KSh 1,500",
     duration: "10 min",
     short: "Removes unwanted facial hair from the chin for a smooth, clean finish.",
     description:
@@ -78,7 +78,7 @@ export const services: Service[] = [
     slug: "sideburn-wax",
     category: "Face",
     name: "Sideburn Wax",
-    price: "$18",
+    price: "KSh 1,800",
     duration: "10 min",
     short: "Removes unwanted hair along the side of the face and sideburn area.",
     description:
@@ -96,7 +96,7 @@ export const services: Service[] = [
     slug: "full-face-wax",
     category: "Face",
     name: "Full Face Wax",
-    price: "$45",
+    price: "KSh 4,500",
     duration: "30 min",
     short: "A complete facial waxing treatment for smooth, hair-free skin.",
     description:
@@ -116,7 +116,7 @@ export const services: Service[] = [
     slug: "nose-wax",
     category: "Face",
     name: "Nose Wax",
-    price: "$15",
+    price: "KSh 1,500",
     duration: "10 min",
     short: "Gentle removal of visible unwanted hair around the nostril area.",
     description:
@@ -134,7 +134,7 @@ export const services: Service[] = [
     slug: "ear-wax",
     category: "Face",
     name: "Ear Wax",
-    price: "$15",
+    price: "KSh 1,500",
     duration: "10 min",
     short: "Removal of visible unwanted hair from the outer ear area.",
     description:
@@ -152,7 +152,7 @@ export const services: Service[] = [
     slug: "underarm-wax",
     category: "Body",
     name: "Underarm Wax",
-    price: "$25",
+    price: "KSh 2,500",
     duration: "15 min",
     short: "Smooth results that outlast shaving by weeks, not days.",
     description:
@@ -172,7 +172,7 @@ export const services: Service[] = [
     slug: "full-arm-wax",
     category: "Body",
     name: "Full Arm Wax",
-    price: "$40",
+    price: "KSh 4,000",
     duration: "30 min",
     short: "Complete hair removal from the arms for smooth, even-looking skin.",
     description:
@@ -191,7 +191,7 @@ export const services: Service[] = [
     slug: "half-arm-wax",
     category: "Body",
     name: "Half Arm Wax",
-    price: "$25",
+    price: "KSh 2,500",
     duration: "20 min",
     short: "Hair removal from either the upper or lower portion of the arm.",
     description:
@@ -209,7 +209,7 @@ export const services: Service[] = [
     slug: "full-leg-wax",
     category: "Body",
     name: "Full Leg Wax",
-    price: "$65",
+    price: "KSh 6,500",
     duration: "45 min",
     short: "Ankle to hip, done efficiently and evenly.",
     description:
@@ -229,7 +229,7 @@ export const services: Service[] = [
     slug: "half-leg-wax",
     category: "Body",
     name: "Half Leg Wax",
-    price: "$40",
+    price: "KSh 4,000",
     duration: "30 min",
     short: "Knee-down or knee-up smoothing, your choice.",
     description:
@@ -247,7 +247,7 @@ export const services: Service[] = [
     slug: "full-body-wax",
     category: "Body",
     name: "Full Body Wax",
-    price: "$150",
+    price: "KSh 15,000",
     duration: "90 min",
     short: "A comprehensive waxing experience covering multiple areas of the body in one appointment.",
     description:
@@ -270,7 +270,7 @@ export const services: Service[] = [
     slug: "bikini-wax",
     category: "Bikini & Intimate",
     name: "Bikini Wax",
-    price: "$35",
+    price: "KSh 3,500",
     duration: "20 min",
     short: "A clean line just beyond where a swimsuit sits.",
     description:
@@ -288,7 +288,7 @@ export const services: Service[] = [
     slug: "extended-bikini-wax",
     category: "Bikini & Intimate",
     name: "Extended Bikini Wax",
-    price: "$45",
+    price: "KSh 4,500",
     duration: "25 min",
     short: "A more extensive bikini wax that removes hair further along the bikini line.",
     description:
@@ -306,7 +306,7 @@ export const services: Service[] = [
     slug: "brazilian-wax",
     category: "Bikini & Intimate",
     name: "Brazilian Wax",
-    price: "$55",
+    price: "KSh 5,500",
     duration: "30 min",
     short: "Full removal, front to back, with a Cerologist who's done it thousands of times.",
     description:
@@ -329,7 +329,7 @@ export const services: Service[] = [
     slug: "hollywood-wax",
     category: "Bikini & Intimate",
     name: "Hollywood Wax",
-    price: "$65",
+    price: "KSh 6,500",
     duration: "40 min",
     short: "A complete intimate waxing treatment that removes all hair from the front and back intimate areas.",
     description:
@@ -351,7 +351,7 @@ export const services: Service[] = [
     slug: "buttocks-wax",
     category: "Bikini & Intimate",
     name: "Buttocks Wax",
-    price: "$40",
+    price: "KSh 4,000",
     duration: "20 min",
     short: "Removes unwanted hair from the buttocks area for a smooth finish.",
     description:
@@ -372,7 +372,7 @@ export const services: Service[] = [
     slug: "full-back-wax",
     category: "Back & Torso",
     name: "Full Back Wax",
-    price: "$55",
+    price: "KSh 5,500",
     duration: "35 min",
     short: "Professional hair removal across the back for smooth, clean-looking skin.",
     description:
@@ -391,7 +391,7 @@ export const services: Service[] = [
     slug: "chest-wax",
     category: "Back & Torso",
     name: "Chest Wax",
-    price: "$45",
+    price: "KSh 4,500",
     duration: "30 min",
     short: "Removes unwanted chest hair for a smoother appearance.",
     description:
@@ -409,7 +409,7 @@ export const services: Service[] = [
     slug: "stomach-wax",
     category: "Back & Torso",
     name: "Stomach Wax",
-    price: "$35",
+    price: "KSh 3,500",
     duration: "20 min",
     short: "Removes unwanted hair from the stomach area.",
     description:
@@ -425,7 +425,7 @@ export const services: Service[] = [
     slug: "chest-and-stomach-wax",
     category: "Back & Torso",
     name: "Chest & Stomach Wax",
-    price: "$70",
+    price: "KSh 7,000",
     duration: "45 min",
     short: "A combined treatment for a smoother chest and stomach area.",
     description:
@@ -446,7 +446,7 @@ export const services: Service[] = [
     slug: "smooth-and-simple",
     category: "Packages",
     name: "Smooth & Simple",
-    price: "$80",
+    price: "KSh 8,000",
     duration: "45 min",
     short: "Underarms, bikini, and half legs — the essentials in one visit.",
     description:
@@ -467,7 +467,7 @@ export const services: Service[] = [
     slug: "full-body-smooth",
     category: "Packages",
     name: "Full Body Smooth",
-    price: "$180",
+    price: "KSh 18,000",
     duration: "90 min",
     short: "Full legs, full arms, underarms, and bikini — the complete package.",
     description:
@@ -488,7 +488,7 @@ export const services: Service[] = [
     slug: "face-fresh",
     category: "Packages",
     name: "Face Fresh",
-    price: "$45",
+    price: "KSh 4,500",
     duration: "25 min",
     short: "Eyebrows, upper lip, and chin — a complete facial waxing session.",
     description:
@@ -507,7 +507,7 @@ export const services: Service[] = [
     slug: "brazilian-care-package",
     category: "Packages",
     name: "Brazilian Care Package",
-    price: "$75",
+    price: "KSh 7,500",
     duration: "40 min",
     short: "Brazilian wax plus underarms and aftercare guidance.",
     description:
