@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const columns = [
   {
@@ -33,7 +34,7 @@ export default function Footer() {
     <footer className="bg-footer text-on-footer">
       <div className="mx-auto grid max-w-[1400px] gap-10 px-6 py-16 md:grid-cols-[1.3fr_1fr_1fr_1fr] md:px-10">
         <div>
-          <p className="text-2xl font-semibold text-primary-warm">Waxora</p>
+          <Image src="/Logo.png" alt="Waxora logo" width={140} height={40} className="h-10 w-auto bg-white rounded-full" />
           <p className="mt-3 max-w-[32ch] text-sm text-on-footer-muted">
             Waxing, done with care and a steady hand. Professional skin care services.
           </p>
