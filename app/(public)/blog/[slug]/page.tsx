@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Button from "@/components/Button";
-import { blogPosts } from "@/lib/data";
+import { getBlogPosts, getBlogPostBySlug } from "@/lib/supabase/queries";
 
-export function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const posts = await getBlogPosts();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -14,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogPostBySlug(slug);
   return { title: post ? `${post.title} · Waxora` : "Post not found" };
 }
 
@@ -24,7 +25,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogPostBySlug(slug);
   if (!post) notFound();
 
   return (
@@ -33,11 +34,11 @@ export default async function BlogPostPage({
         ← All articles
       </Link>
       <p className="mt-6 text-xs font-medium text-primary">
-        {post.category} · {post.readTime}
+        {post.category} · {post.read_time}
       </p>
       <h1 className="mt-3 font-semibold text-4xl leading-tight text-on-background">{post.title}</h1>
       <p className="mt-4 text-sm text-on-surface-muted">
-        {new Date(post.date).toLocaleDateString("en-US", {
+        {new Date(post.published_at).toLocaleDateString("en-US", {
           month: "long",
           day: "numeric",
           year: "numeric",
@@ -45,7 +46,7 @@ export default async function BlogPostPage({
       </p>
 
       <div className="mt-10 flex flex-col gap-5">
-        {post.body.map((paragraph, i) => (
+        {post.content.map((paragraph, i) => (
           <p key={i} className="text-[17px] leading-relaxed text-on-surface">
             {paragraph}
           </p>

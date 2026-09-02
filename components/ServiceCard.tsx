@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Service } from "@/lib/data";
+import { Service } from "@/lib/types";
 
 export default function ServiceCard({ service }: { service: Service }) {
   return (
@@ -20,8 +20,8 @@ export default function ServiceCard({ service }: { service: Service }) {
         <p className="mt-2 text-sm leading-relaxed text-on-surface-muted">{service.short}</p>
       </div>
       <div className="mt-6 flex items-center justify-between border-t border-outline pt-4 text-sm">
-        <span className="text-on-surface-muted">{service.duration}</span>
-        <span className="font-semibold text-on-background">{service.price}</span>
+        <span className="text-on-surface-muted">{service.duration_minutes} min</span>
+        <span className="font-semibold text-on-background">KSh {service.price.toLocaleString()}</span>
       </div>
     </Link>
   );

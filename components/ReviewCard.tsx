@@ -1,4 +1,4 @@
-import { Review } from "@/lib/data";
+import { Review } from "@/lib/types";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -25,11 +25,11 @@ export default function ReviewCard({ review }: { review: Review }) {
       <div>
         <Stars rating={review.rating} />
         <blockquote className="mt-4 text-[15px] leading-relaxed text-on-footer">
-          “{review.quote}”
+          &ldquo;{review.review_text}&rdquo;
         </blockquote>
       </div>
       <figcaption className="mt-6 text-sm text-on-footer-muted">
-        <span className="font-medium text-on-footer">{review.name}</span> · {review.service} ·{" "}
+        <span className="font-medium text-on-footer">{review.customer_name}</span> · {review.service} ·{" "}
         {review.date}
       </figcaption>
     </figure>

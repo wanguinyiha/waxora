@@ -3,9 +3,10 @@ import Link from "next/link";
 import { Metadata } from "next";
 import Button from "@/components/Button";
 import ServiceCard from "@/components/ServiceCard";
-import { services } from "@/lib/data";
+import { getServices, getServiceBySlug } from "@/lib/supabase/queries";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const services = await getServices();
   return services.map((s) => ({ slug: s.slug }));
 }
 
@@ -15,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = await getServiceBySlug(slug);
   return { title: service ? `${service.name} · Waxora` : "Service not found" };
 }
 
@@ -25,10 +26,13 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = await getServiceBySlug(slug);
   if (!service) notFound();
 
-  const related = services.filter((s) => s.category === service.category && s.slug !== service.slug).slice(0, 3);
+  const allServices = await getServices();
+  const related = allServices
+    .filter((s) => s.category === service.category && s.slug !== service.slug)
+    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 md:py-20">
@@ -86,8 +90,8 @@ export default async function ServiceDetailPage({
 
         <aside className="h-fit rounded-lg border border-outline bg-surface-elevated p-6">
           <div className="flex items-baseline justify-between">
-            <span className="font-semibold text-3xl text-primary">{service.price}</span>
-            <span className="text-sm text-on-surface-muted">{service.duration}</span>
+            <span className="font-semibold text-3xl text-primary">KSh {service.price.toLocaleString()}</span>
+            <span className="text-sm text-on-surface-muted">{service.duration_minutes} min</span>
           </div>
           <p className="mt-2 text-xs text-on-surface-muted">
             Standard rate — confirmed at booking for your studio.

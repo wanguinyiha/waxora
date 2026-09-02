@@ -1,25 +1,19 @@
 import Image from "next/image";
 import { Metadata } from "next";
 import Button from "@/components/Button";
+import { getSiteSetting } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "About · Waxora" };
 
-const values = [
-  {
-    title: "Trained, not just certified",
-    body: "Every Cerologist completes supervised hands-on hours before working solo — certification is the floor, not the finish line.",
-  },
-  {
-    title: "Say what's happening",
-    body: "You'll know what area is next and what to expect before it happens. No surprises mid-service.",
-  },
-  {
-    title: "No pressure add-ons",
-    body: "We'll mention a service if it genuinely fits what you're asking for. We won't if it doesn't.",
-  },
-];
+export default async function AboutPage() {
+  const [valuesData, heroImageData] = await Promise.all([
+    getSiteSetting("company_values"),
+    getSiteSetting("about_hero_image"),
+  ]);
 
-export default function AboutPage() {
+  const values = (valuesData as unknown as Array<{ title: string; body: string }>) ?? [];
+  const heroImage = heroImageData as unknown as { src: string; alt: string } | null;
+
   return (
     <div>
       <section className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 md:grid-cols-2 md:items-center md:px-10 md:py-24">
@@ -40,13 +34,15 @@ export default function AboutPage() {
           </p>
         </div>
         <div className="aspect-[4/3] overflow-hidden rounded-lg">
-          <Image
-            src="https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?w=900&q=80"
-            alt="Interior of a calm, plant-filled waxing studio"
-            width={900}
-            height={675}
-            className="h-full w-full object-cover"
-          />
+          {heroImage && (
+            <Image
+              src={heroImage.src}
+              alt={heroImage.alt}
+              width={900}
+              height={675}
+              className="h-full w-full object-cover"
+            />
+          )}
         </div>
       </section>
 

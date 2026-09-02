@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FAQItem } from "@/lib/data";
+import { FAQItem } from "@/lib/types";
 
 export default function FaqAccordion({ items }: { items: FAQItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);

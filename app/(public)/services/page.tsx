@@ -1,12 +1,13 @@
 import { Metadata } from "next";
 import ServiceCard from "@/components/ServiceCard";
-import { services, ServiceCategory } from "@/lib/data";
+import { getServices } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Services · Waxora" };
 
-const categories: ServiceCategory[] = ["Face", "Body", "Bikini & Intimate", "Back & Torso", "Packages"];
+export default async function ServicesPage() {
+  const services = await getServices();
+  const categories = [...new Set(services.map((s) => s.category))];
 
-export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 md:py-20">
       <div className="max-w-[60ch]">

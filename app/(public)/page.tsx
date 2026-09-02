@@ -2,11 +2,21 @@ import Image from "next/image";
 import Button from "@/components/Button";
 import ServiceCard from "@/components/ServiceCard";
 import ReviewCard from "@/components/ReviewCard";
-import { services, reviews } from "@/lib/data";
+import { getPopularServices, getApprovedReviews, getSiteSetting } from "@/lib/supabase/queries";
 
-export default function Home() {
-  const popular = services.filter((s) => s.popular);
-  const topReviews = reviews.slice(0, 3);
+export default async function Home() {
+  const [popular, topReviews, statsData, heroImagesData, whyUsData] = await Promise.all([
+    getPopularServices(),
+    getApprovedReviews(),
+    getSiteSetting("homepage_stats"),
+    getSiteSetting("hero_images"),
+    getSiteSetting("why_us_bullets"),
+  ]);
+
+  const stats = (statsData as unknown as Array<{ value: string; label: string }>) ?? [];
+  const heroImages = (heroImagesData as unknown as Array<{ src: string; alt: string }>) ?? [];
+  const whyUsBullets = (whyUsData as unknown as string[]) ?? [];
+  const topThreeReviews = topReviews.slice(0, 3);
 
   return (
     <div>
@@ -20,7 +30,7 @@ export default function Home() {
           </h1>
           <p className="mt-6 max-w-[42ch] text-[17px] leading-relaxed text-on-surface-muted">
             Face, body, and brow waxing from Cerologists trained to make it quick, precise, and
-            far more comfortable than you'd expect. Walk in tense, walk out smooth.
+            far more comfortable than you&apos;d expect. Walk in tense, walk out smooth.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button href="/booking">Book an appointment</Button>
@@ -29,41 +39,39 @@ export default function Home() {
             </Button>
           </div>
           <div className="mt-10 flex gap-8 border-t border-outline pt-6 text-sm">
-            <div>
-              <p className="font-semibold text-2xl text-on-background">4.9</p>
-              <p className="mt-1 text-on-surface-muted">Average rating</p>
-            </div>
-            <div>
-              <p className="font-semibold text-2xl text-on-background">12k+</p>
-              <p className="mt-1 text-on-surface-muted">Appointments a year</p>
-            </div>
-            <div>
-              <p className="font-semibold text-2xl text-on-background">2</p>
-              <p className="mt-1 text-on-surface-muted">Studio locations</p>
-            </div>
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <p className="font-semibold text-2xl text-on-background">{stat.value}</p>
+                <p className="mt-1 text-on-surface-muted">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="relative">
           <div className="aspect-[4/5] overflow-hidden rounded-lg bg-surface">
-            <Image
-              src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=80"
-              alt="A calm, softly lit waxing studio treatment room"
-              width={900}
-              height={1125}
-              className="h-full w-full object-cover"
-              priority
-            />
+            {heroImages[0] && (
+              <Image
+                src={heroImages[0].src}
+                alt={heroImages[0].alt}
+                width={900}
+                height={1125}
+                className="h-full w-full object-cover"
+                priority
+              />
+            )}
           </div>
-          <div className="absolute -bottom-8 -left-8 hidden aspect-square w-40 overflow-hidden rounded-lg border-4 border-background shadow-raised md:block">
-            <Image
-              src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80"
-              alt="Skincare products arranged on a studio counter"
-              width={400}
-              height={400}
-              className="h-full w-full object-cover"
-            />
-          </div>
+          {heroImages[1] && (
+            <div className="absolute -bottom-8 -left-8 hidden aspect-square w-40 overflow-hidden rounded-lg border-4 border-background shadow-raised md:block">
+              <Image
+                src={heroImages[1].src}
+                alt={heroImages[1].alt}
+                width={400}
+                height={400}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
         </div>
       </section>
 
@@ -92,13 +100,15 @@ export default function Home() {
       <section className="bg-surface">
         <div className="mx-auto grid max-w-[1400px] gap-12 px-6 py-16 md:grid-cols-2 md:items-center md:px-10 md:py-24">
           <div className="order-2 aspect-[4/3] overflow-hidden rounded-lg md:order-1">
-            <Image
-              src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=900&q=80"
-              alt="An esthetician preparing wax during an appointment"
-              width={900}
-              height={675}
-              className="h-full w-full object-cover"
-            />
+            {heroImages[2] && (
+              <Image
+                src={heroImages[2].src}
+                alt={heroImages[2].alt}
+                width={900}
+                height={675}
+                className="h-full w-full object-cover"
+              />
+            )}
           </div>
           <div className="order-1 md:order-2">
             <h2 className="font-semibold text-3xl text-primary md:text-4xl">
@@ -107,22 +117,16 @@ export default function Home() {
             <p className="mt-5 max-w-[48ch] leading-relaxed text-on-surface-muted">
               Every Cerologist completes hands-on training before they see a client, and our wax
               is formulated to grip hair rather than skin — which is most of why our appointments
-              run comfortably rather than painfully. You'll always know what's happening before
+              run comfortably rather than painfully. You&apos;ll always know what&apos;s happening before
               it happens.
             </p>
             <ul className="mt-6 flex flex-col gap-3 text-sm text-on-surface">
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                Single-use application sticks, every time
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                Low-temperature wax suited to sensitive skin
-              </li>
-              <li className="flex gap-3">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                Private rooms for every body service
-              </li>
+              {whyUsBullets.map((bullet) => (
+                <li key={bullet} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  {bullet}
+                </li>
+              ))}
             </ul>
             <Button href="/about" className="mt-8 w-fit">
               Get to know us
@@ -140,8 +144,8 @@ export default function Home() {
           </Button>
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {topReviews.map((review) => (
-            <ReviewCard key={review.name} review={review} />
+          {topThreeReviews.map((review) => (
+            <ReviewCard key={review.id} review={review} />
           ))}
         </div>
       </section>
@@ -152,7 +156,7 @@ export default function Home() {
           <div>
             <h2 className="font-semibold text-3xl md:text-4xl">Ready for your next appointment?</h2>
             <p className="mt-3 max-w-[46ch] text-on-primary/80">
-              Pick a service, choose a time that works, and we'll take care of the rest.
+              Pick a service, choose a time that works, and we&apos;ll take care of the rest.
             </p>
           </div>
           <Button href="/booking" className="bg-white text-primary hover:bg-white/90">

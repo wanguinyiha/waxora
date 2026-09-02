@@ -1,12 +1,16 @@
 import { Metadata } from "next";
 import ReviewCard from "@/components/ReviewCard";
 import Button from "@/components/Button";
-import { reviews } from "@/lib/data";
+import { getApprovedReviews } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Reviews · Waxora" };
 
-export default function ReviewsPage() {
-  const average = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+export default async function ReviewsPage() {
+  const reviews = await getApprovedReviews();
+  const average =
+    reviews.length > 0
+      ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+      : "0";
 
   return (
     <div className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 md:py-20">
@@ -26,14 +30,14 @@ export default function ReviewsPage() {
 
       <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {reviews.map((review) => (
-          <ReviewCard key={review.name} review={review} />
+          <ReviewCard key={review.id} review={review} />
         ))}
       </div>
 
       <div className="mt-16 rounded-lg bg-surface p-8 text-center">
         <p className="font-semibold text-2xl text-on-background">Had an appointment with us?</p>
         <p className="mt-2 text-on-surface-muted">
-          We read every review — it's how we know what's working.
+          We read every review — it&apos;s how we know what&apos;s working.
         </p>
         <Button href="/contact" variant="dark" className="mt-6 w-fit">
           Leave a review

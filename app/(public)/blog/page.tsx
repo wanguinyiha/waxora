@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Metadata } from "next";
-import { blogPosts } from "@/lib/data";
+import { getBlogPosts } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Blog · Waxora" };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const blogPosts = await getBlogPosts();
+
   return (
     <div className="mx-auto max-w-[1000px] px-6 py-16 md:px-10 md:py-20">
       <div className="max-w-[60ch]">
@@ -31,7 +33,7 @@ export default function BlogPage() {
                 {post.excerpt}
               </p>
             </div>
-            <p className="whitespace-nowrap text-sm text-on-surface-muted">{post.readTime}</p>
+            <p className="whitespace-nowrap text-sm text-on-surface-muted">{post.read_time}</p>
           </Link>
         ))}
       </div>
