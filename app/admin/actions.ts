@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendBookingConfirmed, sendBookingCancelled } from "@/lib/email";
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
@@ -73,6 +74,35 @@ export async function updateBookingStatus(
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (status === "confirmed" || status === "cancelled") {
+    try {
+      const { data: booking } = await supabase
+        .from("bookings")
+        .select("customer_name, customer_email, appointment_date, start_time, end_time, services(name)")
+        .eq("id", bookingId)
+        .single();
+
+      if (booking) {
+        const emailInput = {
+          customerName: booking.customer_name,
+          customerEmail: booking.customer_email,
+          serviceName: booking.services?.[0]?.name ?? "Service",
+          appointmentDate: booking.appointment_date,
+          startTime: booking.start_time,
+          endTime: booking.end_time,
+        };
+
+        if (status === "confirmed") {
+          await sendBookingConfirmed(emailInput);
+        } else {
+          await sendBookingCancelled(emailInput);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to send status email:", err);
+    }
   }
 
   return { error: null };
