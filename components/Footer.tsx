@@ -19,13 +19,13 @@ const columns = [
       { href: "/about", label: "About us" },
     ],
   },
-  {
-    title: "Account",
-    links: [
-      { href: "/account", label: "My appointments" },
-      { href: "/contact", label: "Contact support" },
-    ],
-  },
+  // {
+  //   title: "Account",
+  //   links: [
+  //     // { href: "/account", label: "My appointments" },
+  //     // { href: "/contact", label: "Contact support" },
+  //   ],
+  // },
 ];
 
 export default function Footer() {

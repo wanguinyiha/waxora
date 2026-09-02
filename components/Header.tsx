@@ -9,7 +9,7 @@ const links = [
   { href: "/blog", label: "Blog" },
   { href: "/reviews", label: "Reviews" },
   { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
+ // { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {

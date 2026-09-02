@@ -40,14 +40,14 @@ export default function ContactForm({ studios }: { studios: Studio[] }) {
           className="rounded-md border border-outline-strong bg-surface-elevated px-3.5 py-2.5 text-on-background outline-none focus:border-primary"
         />
       </label>
-      <label className="flex flex-col gap-1.5 text-sm">
+      {/* <label className="flex flex-col gap-1.5 text-sm">
         Preferred studio
         <select className="rounded-md border border-outline-strong bg-surface-elevated px-3.5 py-2.5 text-on-background outline-none focus:border-primary">
           {studios.map((s) => (
             <option key={s.id}>{s.name}</option>
           ))}
         </select>
-      </label>
+      </label> */}
       <label className="flex flex-col gap-1.5 text-sm">
         Message
         <textarea
