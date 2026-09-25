@@ -74,6 +74,13 @@ export type SiteSetting = {
   value: Record<string, unknown>;
 };
 
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "completed"
+  | "cancelled"
+  | "no_show";
+
 export type Booking = {
   id: string;
   service_id: string;
@@ -83,7 +90,7 @@ export type Booking = {
   appointment_date: string;
   start_time: string;
   end_time: string;
-  status: string;
+  status: BookingStatus;
   notes: string | null;
   created_at: string;
   updated_at: string;

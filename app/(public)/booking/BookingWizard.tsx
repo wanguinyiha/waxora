@@ -2,51 +2,29 @@
 
 import { useState, useMemo } from "react";
 import { createBooking } from "./actions";
+import {
+  formatAppointmentDate,
+  formatTimeForDisplay,
+  generateTimeSlots,
+  getDayOfWeek,
+} from "@/lib/booking-policy";
 import type { Service, BusinessHour } from "@/lib/types";
 
 type BookingWizardProps = {
   services: Service[];
   businessHours: BusinessHour[];
+  minimumDate: string;
+  maximumDate: string;
 };
 
 const steps = ["Services", "Date & time", "Your details", "Confirm"];
 
-function generateTimeSlots(opening: string, closing: string): string[] {
-  const slots: string[] = [];
-  const [openH, openM] = opening.split(":").map(Number);
-  const [closeH, closeM] = closing.split(":").map(Number);
-  let currentMinutes = openH * 60 + openM;
-  const closeMinutes = closeH * 60 + closeM;
-
-  while (currentMinutes + 90 <= closeMinutes) {
-    const h = Math.floor(currentMinutes / 60);
-    const m = currentMinutes % 60;
-    const period = h >= 12 ? "PM" : "AM";
-    const displayH = h > 12 ? h - 12 : h === 0 ? 12 : h;
-    slots.push(`${displayH}:${m.toString().padStart(2, "0")} ${period}`);
-    currentMinutes += 90;
-  }
-
-  return slots;
-}
-
-function getMinDate(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  return d.toISOString().split("T")[0];
-}
-
-function getMaxDate(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + 60);
-  return d.toISOString().split("T")[0];
-}
-
-function getDayOfWeek(dateStr: string): number {
-  return new Date(dateStr + "T00:00:00").getDay();
-}
-
-export default function BookingWizard({ services, businessHours }: BookingWizardProps) {
+export default function BookingWizard({
+  services,
+  businessHours,
+  minimumDate,
+  maximumDate,
+}: BookingWizardProps) {
   const [step, setStep] = useState(1);
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -54,6 +32,7 @@ export default function BookingWizard({ services, businessHours }: BookingWizard
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [managementUrl, setManagementUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const selectedServices = useMemo(
@@ -68,12 +47,20 @@ export default function BookingWizard({ services, businessHours }: BookingWizard
     const dow = getDayOfWeek(selectedDate);
     const hours = businessHours.find((bh) => bh.day_of_week === dow);
     if (!hours || !hours.is_open) return [];
-    return generateTimeSlots(hours.opening_time, hours.closing_time);
-  }, [selectedDate, businessHours]);
+    const duration = selectedServices.reduce(
+      (total, service) => total + service.duration_minutes,
+      0
+    );
+    return generateTimeSlots(
+      hours.opening_time,
+      hours.closing_time,
+      duration
+    ).map(formatTimeForDisplay);
+  }, [selectedDate, businessHours, selectedServices]);
 
   const dateLabel = useMemo(() => {
     if (!selectedDate) return "";
-    return new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", {
+    return formatAppointmentDate(selectedDate, {
       weekday: "long",
       month: "long",
       day: "numeric",
@@ -107,6 +94,7 @@ export default function BookingWizard({ services, businessHours }: BookingWizard
       return;
     }
 
+    setManagementUrl(result.managementUrl);
     setSubmitted(true);
     setSubmitting(false);
   }
@@ -121,9 +109,22 @@ export default function BookingWizard({ services, businessHours }: BookingWizard
         </div>
         <h1 className="mt-6 font-semibold text-3xl text-primary">Appointment requested</h1>
         <p className="mt-3 text-on-surface-muted">
-          {selectedServices.map((s) => s.name).join(", ")} · {dateLabel} at {selectedTime} ·
+          {selectedServices.map((s) => s.name).join(", ")} · {dateLabel} at {selectedTime}.
           We&apos;ll email {form.email || "you"} a confirmation shortly.
         </p>
+        {managementUrl && (
+          <div className="mt-8">
+            <a
+              href={managementUrl}
+              className="inline-flex rounded-full bg-primary px-6 py-3 text-sm font-medium text-on-primary"
+            >
+              Manage appointment
+            </a>
+            <p className="mt-4 text-sm text-on-surface-muted">
+              You can edit or cancel it until 24 hours before the appointment.
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -216,8 +217,8 @@ export default function BookingWizard({ services, businessHours }: BookingWizard
             <input
               type="date"
               value={selectedDate}
-              min={getMinDate()}
-              max={getMaxDate()}
+              min={minimumDate}
+              max={maximumDate}
               onChange={(e) => {
                 setSelectedDate(e.target.value);
                 setSelectedTime(null);

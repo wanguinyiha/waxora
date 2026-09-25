@@ -2,18 +2,24 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { sendBookingConfirmed, sendBookingCancelled } from "@/lib/email";
+import { sendBookingCancelled, sendBookingConfirmed } from "@/lib/email";
+import { getBusinessTimeZone } from "@/lib/booking-management";
+import { getDateInTimeZone } from "@/lib/booking-policy";
+import type { BookingStatus } from "@/lib/types";
+
+const bookingStatuses: BookingStatus[] = [
+  "pending",
+  "confirmed",
+  "completed",
+  "cancelled",
+  "no_show",
+];
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
   const supabase = await createClient();
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     redirect(`/admin/login?error=${encodeURIComponent(error.message)}`);
@@ -30,10 +36,11 @@ export async function logout() {
 
 export async function getBookings() {
   const supabase = await createClient();
-
   const { data: bookings, error } = await supabase
     .from("bookings")
-    .select("*, services(name, slug, price, duration_minutes)")
+    .select(
+      "id, service_id, customer_name, customer_email, customer_phone, appointment_date, start_time, end_time, status, notes, created_at, updated_at, services(name, slug, price, duration_minutes)"
+    )
     .order("appointment_date", { ascending: false })
     .order("start_time", { ascending: false });
 
@@ -41,28 +48,47 @@ export async function getBookings() {
     return { bookings: [], error: error.message };
   }
 
-  return { bookings, error: null };
+  const normalizedBookings = (bookings ?? []).map((booking) => ({
+    ...booking,
+    services: Array.isArray(booking.services)
+      ? booking.services[0] ?? null
+      : booking.services ?? null,
+  }));
+
+  return { bookings: normalizedBookings, error: null };
+}
+
+function getServiceName(value: unknown): string {
+  const service = Array.isArray(value) ? value[0] : value;
+  if (service && typeof service === "object") {
+    const name = (service as Record<string, unknown>).name;
+    if (typeof name === "string") return name;
+  }
+  return "Service";
 }
 
 export async function updateBookingStatus(
   bookingId: string,
   status: string
 ) {
+  if (!bookingStatuses.includes(status as BookingStatus)) {
+    return { error: "Invalid booking status." };
+  }
+
   const supabase = await createClient();
+  const { data: existingBooking, error: fetchError } = await supabase
+    .from("bookings")
+    .select("appointment_date, status")
+    .eq("id", bookingId)
+    .single();
+
+  if (fetchError || !existingBooking) {
+    return { error: "Booking not found." };
+  }
 
   if (status === "completed") {
-    const { data: booking, error: fetchError } = await supabase
-      .from("bookings")
-      .select("appointment_date")
-      .eq("id", bookingId)
-      .single();
-
-    if (fetchError || !booking) {
-      return { error: "Booking not found." };
-    }
-
-    const today = new Date().toISOString().split("T")[0];
-    if (booking.appointment_date > today) {
+    const today = getDateInTimeZone(new Date(), getBusinessTimeZone());
+    if (existingBooking.appointment_date > today) {
       return { error: "Cannot complete an appointment before its date." };
     }
   }
@@ -80,7 +106,9 @@ export async function updateBookingStatus(
     try {
       const { data: booking } = await supabase
         .from("bookings")
-        .select("customer_name, customer_email, appointment_date, start_time, end_time, services(name)")
+        .select(
+          "customer_name, customer_email, appointment_date, start_time, end_time, services(name)"
+        )
         .eq("id", bookingId)
         .single();
 
@@ -88,7 +116,7 @@ export async function updateBookingStatus(
         const emailInput = {
           customerName: booking.customer_name,
           customerEmail: booking.customer_email,
-          serviceName: booking.services?.[0]?.name ?? "Service",
+          serviceName: getServiceName(booking.services),
           appointmentDate: booking.appointment_date,
           startTime: booking.start_time,
           endTime: booking.end_time,
@@ -110,11 +138,7 @@ export async function updateBookingStatus(
 
 export async function deleteBooking(bookingId: string) {
   const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("bookings")
-    .delete()
-    .eq("id", bookingId);
+  const { error } = await supabase.from("bookings").delete().eq("id", bookingId);
 
   if (error) {
     return { error: error.message };
@@ -125,9 +149,7 @@ export async function deleteBooking(bookingId: string) {
 
 export async function getBookingStats() {
   const supabase = await createClient();
-
-  const today = new Date().toISOString().split("T")[0];
-
+  const today = getDateInTimeZone(new Date(), getBusinessTimeZone());
   const [totalResult, pendingResult, todayResult, completedResult] =
     await Promise.all([
       supabase.from("bookings").select("id", { count: "exact", head: true }),

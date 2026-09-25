@@ -34,7 +34,10 @@ export default function AdminFaqsPage() {
   };
 
   useEffect(() => {
-    fetchData();
+    const initialLoad = window.setTimeout(() => {
+      void fetchData();
+    }, 0);
+    return () => window.clearTimeout(initialLoad);
   }, []);
 
   function startCreate() {
