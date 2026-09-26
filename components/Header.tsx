@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 
 const links = [
@@ -19,8 +18,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-outline bg-surface-elevated/95 backdrop-blur">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-4 md:px-10">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/Logo.png" alt="Waxora logo" width={559} height={275} className="h-10 w-auto bg-black/75 rounded-full" priority />
+        <Link
+          href="/"
+          className="text-2xl font-semibold tracking-tight text-primary"
+        >
+          Waxora
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
