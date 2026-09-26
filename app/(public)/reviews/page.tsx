@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import ReviewCard from "@/components/ReviewCard";
-import Button from "@/components/Button";
 import { getApprovedReviews } from "@/lib/supabase/queries";
+import ReviewForm from "./ReviewForm";
 
 export const metadata: Metadata = { title: "Reviews · Waxora" };
 
@@ -34,14 +34,16 @@ export default async function ReviewsPage() {
         ))}
       </div>
 
-      <div className="mt-16 rounded-lg bg-surface p-8 text-center">
-        <p className="font-semibold text-2xl text-on-background">Had an appointment with us?</p>
-        <p className="mt-2 text-on-surface-muted">
+      <div className="mt-16 rounded-lg bg-surface p-8">
+        <p className="text-center font-semibold text-2xl text-on-background">
+          Had an appointment with us?
+        </p>
+        <p className="mt-2 text-center text-on-surface-muted">
           We read every review — it&apos;s how we know what&apos;s working.
         </p>
-        <Button href="/contact" variant="dark" className="mt-6 w-fit">
-          Leave a review
-        </Button>
+        <div className="mx-auto mt-8 max-w-2xl">
+          <ReviewForm />
+        </div>
       </div>
     </div>
   );

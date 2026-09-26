@@ -1,3 +1,5 @@
+import type { ContactMessageStatus } from "@/lib/contact";
+
 export type ServiceCategory =
   | "Face"
   | "Body"
@@ -39,6 +41,9 @@ export type Review = {
   rating: number;
   review_text: string;
   date: string;
+  approved?: boolean;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type FAQItem = {
@@ -115,4 +120,16 @@ export type BlockedTime = {
   start_datetime: string;
   end_datetime: string;
   reason: string | null;
+};
+
+export type ContactMessage = {
+  id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  reason: string;
+  message: string;
+  status: ContactMessageStatus;
+  created_at: string;
+  updated_at: string;
 };

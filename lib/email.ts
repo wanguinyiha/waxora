@@ -21,6 +21,23 @@ type BookingEmailInput = {
   managementUrl?: string;
 };
 
+type ContactEmailInput = {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  reason: string;
+  message: string;
+};
+
+function getAdminNotificationEmail(): string | null {
+  const configured =
+    process.env.ADMIN_NOTIFICATION_EMAIL ??
+    process.env.CONTACT_ADMIN_EMAIL ??
+    process.env.SMTP_USER;
+
+  return configured?.trim() || null;
+}
+
 function escapeHtml(value: string): string {
   return value.replace(
     /[&<>'"]/g,
@@ -92,6 +109,74 @@ export async function sendBookingConfirmation(input: BookingEmailInput) {
   } catch (err) {
     console.error("Failed to send booking email:", err);
     return { error: "Failed to send email." };
+  }
+}
+
+function contactDetailsBlock(input: ContactEmailInput) {
+  return `
+    <div style="background: #f9f9f9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Contact Details</p>
+      <p style="margin: 0 0 4px; color: #1a1a1a; font-size: 16px;"><strong>${escapeHtml(input.customerName)}</strong></p>
+      <p style="margin: 0 0 4px; color: #1a1a1a;">${escapeHtml(input.customerEmail)}</p>
+      <p style="margin: 0 0 4px; color: #1a1a1a;">${escapeHtml(input.customerPhone)}</p>
+      <p style="margin: 0; color: #1a1a1a;">Reason: ${escapeHtml(input.reason)}</p>
+    </div>
+    <div style="background: #ffffff; border: 1px solid #eeeeee; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; color: #999; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Message</p>
+      <p style="margin: 0; color: #1a1a1a; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(input.message)}</p>
+    </div>
+  `;
+}
+
+export async function sendContactAdminNotification(input: ContactEmailInput) {
+  const recipient = getAdminNotificationEmail();
+
+  if (!recipient) {
+    return { error: "Admin notification email is not configured." };
+  }
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: recipient,
+      replyTo: input.customerEmail,
+      subject: `New contact message – ${input.reason}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px;">
+          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 8px;">New contact message</h1>
+          <p style="color: #666; margin-bottom: 24px;">A customer submitted a new message through the Waxora contact form.</p>
+          ${contactDetailsBlock(input)}
+          <p style="color: #999; font-size: 12px;">Waxora · Riverton</p>
+        </div>
+      `,
+    });
+    return { error: null };
+  } catch (err) {
+    console.error("Failed to send contact admin notification:", err);
+    return { error: "Failed to send admin notification." };
+  }
+}
+
+export async function sendContactConfirmation(input: ContactEmailInput) {
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: input.customerEmail,
+      subject: `We received your message – ${input.reason}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 32px;">
+          <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 8px;">Message received</h1>
+          <p style="color: #666; margin-bottom: 24px;">Hi ${escapeHtml(input.customerName)}, thanks for reaching out. We received your message and will reply within one business day.</p>
+          ${contactDetailsBlock(input)}
+          <p style="color: #666; font-size: 14px; margin-bottom: 24px;">If this was urgent, please call the studio directly and we'll help as soon as we can.</p>
+          <p style="color: #999; font-size: 12px;">Waxora · Riverton</p>
+        </div>
+      `,
+    });
+    return { error: null };
+  } catch (err) {
+    console.error("Failed to send contact confirmation:", err);
+    return { error: "Failed to send confirmation email." };
   }
 }
 

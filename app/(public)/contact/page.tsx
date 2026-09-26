@@ -16,17 +16,20 @@ export default async function ContactPage() {
       </p>
 
       <div className="mt-12 grid gap-14 md:grid-cols-2">
-        <ContactForm studios={studios} />
+        <ContactForm />
 
         <div className="flex flex-col gap-8">
-          {/* {studios.map((studio) => (
-            <div key={studio.id} className="rounded-lg border border-outline p-6 transition-colors hover:border-primary/40 hover:bg-primary/5">
+          {studios.map((studio) => (
+            <div
+              key={studio.id}
+              className="rounded-lg border border-outline p-6 transition-colors hover:border-primary/40 hover:bg-primary/5"
+            >
               <h2 className="font-semibold text-xl text-primary">{studio.name}</h2>
               <p className="mt-3 text-sm text-on-surface-muted">{studio.address}</p>
               <p className="mt-1 text-sm text-on-surface-muted">{studio.phone}</p>
               <p className="mt-3 text-sm text-on-surface-muted">{studio.hours}</p>
             </div>
-          ))} */}
+          ))}
         </div>
       </div>
     </div>

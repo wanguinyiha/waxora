@@ -277,6 +277,7 @@ export async function checkBookingSlotAvailability(input: {
     .maybeSingle();
 
   if (hoursError) {
+    console.error("business_hours availability check failed:", hoursError);
     return { available: false, error: "Could not check business hours." };
   }
 
@@ -324,6 +325,7 @@ export async function checkBookingSlotAvailability(input: {
 
   const { data: conflictingBookings, error: bookingError } = await bookingQuery;
   if (bookingError) {
+    console.error("bookings availability check failed:", bookingError);
     return { available: false, error: "Could not check appointment availability." };
   }
 
@@ -339,6 +341,7 @@ export async function checkBookingSlotAvailability(input: {
     .limit(1);
 
   if (blockedError) {
+    console.error("blocked_times availability check failed:", blockedError);
     return { available: false, error: "Could not check blocked appointment times." };
   }
 

@@ -9,7 +9,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-[calc(100vh-200px)] bg-background">
       <div className="border-b border-outline bg-surface-elevated">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3 md:px-10">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-3 md:px-10">
           <div className="flex items-center gap-6">
             <Link
               href="/admin"
@@ -21,6 +21,33 @@ export default function AdminLayout({
               Admin
             </span>
           </div>
+
+          <nav className="order-3 flex w-full items-center gap-5 overflow-x-auto text-sm text-on-surface-muted md:order-none md:w-auto">
+            <Link
+              href="/admin"
+              className="whitespace-nowrap transition-colors hover:text-primary"
+            >
+              Bookings
+            </Link>
+            <Link
+              href="/admin/inquiries"
+              className="whitespace-nowrap transition-colors hover:text-primary"
+            >
+              Inquiries
+            </Link>
+            <Link
+              href="/admin/reviews"
+              className="whitespace-nowrap transition-colors hover:text-primary"
+            >
+              Reviews
+            </Link>
+            <Link
+              href="/admin/faqs"
+              className="whitespace-nowrap transition-colors hover:text-primary"
+            >
+              FAQs
+            </Link>
+          </nav>
 
           <div className="flex items-center gap-4">
             <Link

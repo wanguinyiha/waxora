@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createPublicClient } from "@/lib/supabase/server";
 import type {
   Service,
   BlogPost,
@@ -6,10 +6,22 @@ import type {
   FAQItem,
   Studio,
   GalleryImage,
-  SiteSetting,
   Booking,
   BusinessHour,
 } from "@/lib/types";
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String);
+  if (typeof value !== "string" || value === "") return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.map(String);
+    if (typeof parsed === "string" && parsed !== "") return [parsed];
+  } catch {
+    // Plain text column — fall through to a single raw item
+  }
+  return [value];
+}
 
 function mapService(row: Record<string, unknown>): Service {
   return {
@@ -21,9 +33,9 @@ function mapService(row: Record<string, unknown>): Service {
     duration_minutes: row.duration_minutes as number,
     short: (row.short_description as string) ?? "",
     description: (row.description as string) ?? "",
-    includes: (row.includes as string[]) ?? [],
-    prep: (row.prep as string[]) ?? [],
-    aftercare: (row.aftercare as string[]) ?? [],
+    includes: toStringArray(row.includes),
+    prep: toStringArray(row.prep),
+    aftercare: toStringArray(row.aftercare),
     popular: (row.popular as boolean) ?? false,
     is_active: (row.is_active as boolean) ?? true,
   };
@@ -38,7 +50,7 @@ function mapBlogPost(row: Record<string, unknown>): BlogPost {
     published_at: (row.published_at as string) ?? (row.created_at as string),
     read_time: (row.read_time as string) ?? "",
     category: (row.category as string) ?? "",
-    content: (row.content_array as string[]) ?? [],
+    content: toStringArray(row.content_array),
   };
 }
 
@@ -56,7 +68,7 @@ function mapReview(row: Record<string, unknown>): Review {
 // ── Services ──────────────────────────────────────────────
 
 export async function getServices(): Promise<Service[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("services")
     .select("*")
@@ -79,7 +91,7 @@ export async function getAllServices(): Promise<Service[]> {
 export async function getServiceBySlug(
   slug: string
 ): Promise<Service | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("services")
     .select("*")
@@ -102,7 +114,7 @@ export async function getPopularServices(): Promise<Service[]> {
 // ── Blog Posts ────────────────────────────────────────────
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("blog_posts")
     .select("*")
@@ -114,7 +126,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 export async function getBlogPostBySlug(
   slug: string
 ): Promise<BlogPost | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("blog_posts")
     .select("*")
