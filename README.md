@@ -133,7 +133,7 @@ Docker Desktop shares its local image store with the cluster, so `waxora:latest`
 
 ### Production notes
 
-- **Registry**: build/push `ghcr.io/<org>/waxora:<tag>` (CI deferred — see "Follow-ups"), then `kubectl set image deployment/waxora waxora=ghcr.io/<org>/waxora:<tag> -n waxora`. If the registry is private, add an `imagePullSecret` (commented example in `deployment.yaml`).
+- **Registry**: CI publishes to `ghcr.io/<owner>/<repo>` (see §4), then `kubectl set image deployment/waxora waxora=ghcr.io/<owner>/<repo>:<tag> -n waxora`. GHCR packages are private by default — either set the package to *Public* or add an `imagePullSecret` (commented example in `deployment.yaml`).
 - **Ingress/TLS**: no Ingress manifest is shipped — add one for your controller (`nginx-ingress`, `traefik`, cloud LB) terminating TLS and forwarding to `svc/waxora`. Set `NEXT_PUBLIC_SITE_URL` to the public `https://` origin at **build** time so booking links are canonical.
 - **Secrets**: use your platform's secret store (Sealed Secrets, External Secrets, cloud KMS) — never commit `waxora-secrets`.
 - **HPA**: not enabled. The cluster used for testing has no `metrics-server`, and CPU-based autoscaling is not yet justified at this scale.
@@ -160,9 +160,47 @@ kubectl delete ns waxora       # full teardown
 
 ---
 
-## 4. Known follow-ups
+## 4. CI: build & publish (GitHub Actions)
+
+`.github/workflows/docker.yml` runs on every push to `main`, on `v*` tags, and on pull requests:
+
+1. `verify` — `npm ci` → `npm run lint` → `npx tsc --noEmit`
+2. `image` — multi-stage Docker build, pushed to `ghcr.io/<owner>/<repo>` (build cache in the Actions cache)
+
+Tags produced by `docker/metadata-action`:
+
+| Trigger | Tags |
+| --- | --- |
+| push to `main` | `latest`, `sha-<short>` |
+| tag `v1.2.3` | `v1.2.3`, `latest`, `sha-<short>` |
+| pull request | *(built, not pushed — validates the Dockerfile)* |
+
+### One-time setup (required)
+
+The `NEXT_PUBLIC_*` values are inlined into the bundle, so they must exist as **Actions variables** —
+GitHub → *Settings → Secrets and variables → Actions → Variables* → add:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `NEXT_PUBLIC_SITE_URL` — **the real production origin** (e.g. `https://waxora.example.com`); release images bake this into booking links
+
+Until they are set, the `image` job fails fast with a message naming the missing variables
+(`verify` still passes — release builds must never publish with empty public config).
+Auth uses the built-in `GITHUB_TOKEN` (`packages: write`); no PAT is needed.
+
+### Release
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0     # -> ghcr.io/<owner>/waxora:v1.0.0
+kubectl set image deployment/waxora \
+  waxora=ghcr.io/<owner>/waxora:v1.0.0 -n waxora
+kubectl rollout status deployment/waxora -n waxora
+```
+
+---
+
+## 5. Known follow-ups
 
 - **Dependencies**: `npm audit` still reports the `next` advisory affecting `next/og` (Waxora does not import `next/og`; fix requires a `next` bump past the current pin) and a `nodemailer` advisory requiring a major upgrade. Both need deliberate testing, not an automatic bump.
-- **CI/CD**: no pipeline yet — next step is building and pushing to GHCR on tag, then applying manifests.
 - **Admin seed credentials**: `scripts/seed-admin.ts` now reads `SEED_ADMIN_*` from the environment; rotate any credentials that were ever committed historically.
 - **Runtime images**: gallery/hero images are remote Unsplash URLs optimized on the fly by `next/image`. In constrained clusters slow egress can exceed Next's ~7s upstream timeout (observed as `504` on `/_next/image`); prefer serving them from Supabase Storage/CDN in production.
