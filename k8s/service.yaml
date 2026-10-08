@@ -1,0 +1,20 @@
+# Internal-only Service. Expose it through an Ingress (TLS at the edge) rather
+# than NodePort/LoadBalancer — the Ingress controller terminates HTTPS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: waxora
+  namespace: waxora
+  labels:
+    app: waxora
+    app.kubernetes.io/name: waxora
+    app.kubernetes.io/part-of: waxora
+spec:
+  type: ClusterIP
+  selector:
+    app: waxora
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

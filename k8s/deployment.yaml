@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: waxora
+  namespace: waxora
+  labels:
+    app: waxora
+    app.kubernetes.io/name: waxora
+    app.kubernetes.io/part-of: waxora
+spec:
+  # The app is stateless: all customer/admin data lives in Supabase, so any
+  # pod can serve any request and replicas can be scaled freely.
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: waxora
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: waxora
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      # For a private GHCR image only — never commit registry credentials:
+      # imagePullSecrets:
+      #   - name: ghcr-credentials
+      containers:
+        - name: waxora
+          # Prefer an immutable tag in production, e.g. ghcr.io/wanguinyiha/waxora:<git-sha>
+          image: ghcr.io/wanguinyiha/waxora:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: waxora-config
+            - secretRef:
+                name: waxora-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 192Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          # startup: the server may take a while to boot — give it up to 150s
+          # before the liveness probe starts counting failures.
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+          # ready: safe to send traffic to this pod
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # alive: the process is responsive — restart only if it truly hangs
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            # Next.js writes the image-optimisation cache under .next/cache
+            - name: next-cache
+              mountPath: /app/.next/cache
+            # Node.js / sharp temporary files
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: next-cache
+          emptyDir:
+            sizeLimit: 256Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi

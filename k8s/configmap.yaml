@@ -1,0 +1,18 @@
+# Non-sensitive, runtime configuration.
+#
+# NOTE: NEXT_PUBLIC_* values are NOT here on purpose — Next.js inlines them into
+# the bundle at build time, so changing them requires rebuilding the image
+# (see Dockerfile build args). Only variables read at runtime belong in a ConfigMap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: waxora-config
+  namespace: waxora
+  labels:
+    app: waxora
+data:
+  BUSINESS_TIMEZONE: "Africa/Nairobi"
+  SMTP_HOST: "smtp.example.com"
+  SMTP_PORT: "587"
+  SMTP_USER: "no-reply@example.com"
+  ADMIN_NOTIFICATION_EMAIL: "admin@example.com"

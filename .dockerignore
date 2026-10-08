@@ -1,24 +1,45 @@
-**/.classpath
-**/.dockerignore
+# ── VCS / editor / agent tooling ─────────────────────────────
+.git
+.gitignore
+.github
+.vscode
+.agents
+.dockerignore
+
+# ── Dependencies & build output (never ship the host's) ──────
+node_modules
+.next
+out
+build
+coverage
+
+# ── Secrets: no env file may ever enter an image layer ───────
+.env
+.env.*
 **/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/charts
-**/docker-compose*
-**/compose*
-**/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-LICENSE
-README.md
+**/.env.*
+
+# ── Logs ─────────────────────────────────────────────────────
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Docker / Compose / Kubernetes definitions ────────────────
+Dockerfile*
+docker-compose*
+compose*
+k8s
+
+# ── Docs & tooling not required to build the app ─────────────
+*.md
+AGENTS.md
+CLAUDE.md
+skills-lock.json
+tsconfig.tsbuildinfo
+
+# ── Dev-only scripts (contain local credentials) ─────────────
+scripts
+
+# ── Supabase migrations: applied out-of-band, not at runtime ─
+supabase

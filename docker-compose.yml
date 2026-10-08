@@ -1,0 +1,23 @@
+# Single-service Compose file: Waxora only.
+# Supabase is an external managed service — do NOT add a database container here.
+#
+#   docker compose up --build
+#   docker compose down
+#
+# Build args come from `.env` (NEXT_PUBLIC_* are inlined at build time);
+# runtime variables are injected from the same file via env_file.
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+        NEXT_DEPLOYMENT_ID: ${NEXT_DEPLOYMENT_ID:-}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped

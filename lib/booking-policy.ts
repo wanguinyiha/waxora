@@ -4,8 +4,8 @@ export const ACTIVE_BOOKING_STATUSES = ["pending", "confirmed"] as const;
 
 export function getBusinessTimeZone(): string {
   return (
-    process.env.BUSINESS_TIMEZONE ??
-    process.env.NEXT_PUBLIC_BUSINESS_TIMEZONE ??
+    process.env.BUSINESS_TIMEZONE ||
+    process.env.NEXT_PUBLIC_BUSINESS_TIMEZONE ||
     DEFAULT_BUSINESS_TIMEZONE
   );
 }
