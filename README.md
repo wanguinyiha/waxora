@@ -203,6 +203,6 @@ kubectl rollout status deployment/waxora -n waxora
 
 ## 5. Known follow-ups
 
-- **Dependencies**: `npm audit` still reports the `next` advisory affecting `next/og` (Waxora does not import `next/og`; fix requires a `next` bump past the current pin) and a `nodemailer` advisory requiring a major upgrade. Both need deliberate testing, not an automatic bump.
+- **Dependencies**: `next` 16.3.8 and `nodemailer` 10.0.16 clear the previous security advisories (verified with `lint`, `tsc`, `next build`, Docker image build and a container smoke test). `npm audit` still reports `braces` (high) — **dev-only**, pulled in through `eslint-config-next` → `fast-glob`; it is absent from `next/standalone` and from the image, and no fixed release exists yet, so the only "fix" npm offers is downgrading `eslint-config-next` to 14.x, which would break Next 16 linting. Left in place deliberately.
 - **Admin seed credentials**: `scripts/seed-admin.ts` now reads `SEED_ADMIN_*` from the environment; rotate any credentials that were ever committed historically.
 - **Runtime images**: gallery/hero images are remote Unsplash URLs optimized on the fly by `next/image`. In constrained clusters slow egress can exceed Next's ~7s upstream timeout (observed as `504` on `/_next/image`); prefer serving them from Supabase Storage/CDN in production.
