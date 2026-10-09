@@ -120,20 +120,22 @@ kubectl create secret generic waxora-secrets -n waxora \
 ### Local (Docker Desktop) smoke test
 
 ```bash
-kubectl apply -f k8s/
-# pods will show ErrImagePull: the default image is ghcr.io/... and does not exist yet
+kubectl apply -f k8s/                 # image ghcr.io/wanguinyiha/waxora:latest pulls anonymously (package is Public)
 kubectl create secret generic waxora-secrets -n waxora \
   --from-literal=SUPABASE_SERVICE_ROLE_KEY=... --from-literal=SMTP_PASSWORD=...
-kubectl set image deployment/waxora waxora=waxora:latest -n waxora   # local image
 kubectl rollout status deployment/waxora -n waxora
 kubectl port-forward svc/waxora 8080:80 -n waxora
 ```
 
-Docker Desktop shares its local image store with the cluster, so `waxora:latest` built locally is pullable with `imagePullPolicy: IfNotPresent`.
+To iterate on a local build instead, point the Deployment at it — Docker Desktop shares its image store with the cluster, so `waxora:latest` is pullable with `imagePullPolicy: IfNotPresent`:
+
+```bash
+kubectl set image deployment/waxora waxora=waxora:latest -n waxora
+```
 
 ### Production notes
 
-- **Registry**: CI publishes to `ghcr.io/<owner>/<repo>` (see §4), then `kubectl set image deployment/waxora waxora=ghcr.io/<owner>/<repo>:<tag> -n waxora`. GHCR packages are private by default — either set the package to *Public* or add an `imagePullSecret` (commented example in `deployment.yaml`).
+- **Registry**: CI publishes to `ghcr.io/<owner>/<repo>` (see §4), then `kubectl set image deployment/waxora waxora=ghcr.io/<owner>/<repo>:<tag> -n waxora`. This package is currently **Public** (anonymous pull verified from the cluster); if you make it private, add an `imagePullSecret` — a commented example is in `deployment.yaml`.
 - **Ingress/TLS**: no Ingress manifest is shipped — add one for your controller (`nginx-ingress`, `traefik`, cloud LB) terminating TLS and forwarding to `svc/waxora`. Set `NEXT_PUBLIC_SITE_URL` to the public `https://` origin at **build** time so booking links are canonical.
 - **Secrets**: use your platform's secret store (Sealed Secrets, External Secrets, cloud KMS) — never commit `waxora-secrets`.
 - **HPA**: not enabled. The cluster used for testing has no `metrics-server`, and CPU-based autoscaling is not yet justified at this scale.
